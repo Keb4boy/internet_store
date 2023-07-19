@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "internet-store"
+version = "0.1.0"
+description = ""
+authors = ["keb4boy <Grecha_AI_2005@icloud.com>"]
+readme = "README.md"
+packages = [{include = "internet_store"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.17"
+sqlalchemy-utils = "^0.41.1"
+alembic = "^1.11.1"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.6"
+uvicorn = "^0.23.0"
+fastapi = "^0.100.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
