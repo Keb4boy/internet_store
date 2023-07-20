@@ -10,7 +10,7 @@ class BaseModel(DeclarativeBase):
 class Vendor(BaseModel):
     __tablename__ = "vendors"
 
-    name = Column(String, nullable=False)
+    name = Column(VARCHAR(255), nullable=False)
 
 
 class Warehouse(BaseModel):

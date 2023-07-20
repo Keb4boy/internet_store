@@ -1,36 +1,30 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from pydantic import BaseModel
-from sqlalchemy import VARCHAR, create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from config import DB_PASSWORD, DB_HOST, DB_NAME, DB_PORT, DB_USER
 from internet_store.models import Vendor
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 
+engine: AsyncEngine = create_async_engine(f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
+async_session: AsyncSession = sessionmaker(engine, class_= AsyncSession)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'))
 
 app = FastAPI()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-class VendorResponse(BaseModel):
-    id: int
-    name: VARCHAR(255)
+class VendorSchema(BaseModel):
+    name: str
 
-@app.get("/vendors/{vendor_id}", response_model=VendorResponse)
-def get_vendor(vendor_id: int):
+@app.get("/vendors/{vendor_id}", response_model=VendorSchema)
+async def get_vendor(vendor_id: int):
     vendor = Vendor.query.get(vendor_id)
-    return VendorResponse(id=vendor.id, name=vendor.name)
+    return VendorSchema(id=vendor.id, name=vendor.name)
 
-@app.post("/vendors", response_model=VendorResponse)
-def add_vendor(new_vendor: Vendor):
-    db = SessionLocal()
-    db.add(new_vendor)
-    db.commit()
-    db.refresh(new_vendor)
-    return new_vendor
+@app.post("/vendors/create")
+async def add_vendor(item: VendorSchema):
+    new_vendor = Vendor(**item)
+    async with async_session() as session:
+        session.add(new_vendor)
+        await session.commit()
+    return item
 
