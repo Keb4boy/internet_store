@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 from config import DB_PASSWORD, DB_HOST, DB_NAME, DB_PORT, DB_USER
-from internet_store.models import Vendor
+from internet_store.models import Vendor, Buyer
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
+
 
 engine: AsyncEngine = create_async_engine(f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 async_session: AsyncSession = sessionmaker(engine, class_= AsyncSession)
@@ -15,16 +17,49 @@ app = FastAPI()
 class VendorSchema(BaseModel):
     name: str
 
+
 @app.get("/vendors/{vendor_id}", response_model=VendorSchema)
 async def get_vendor(vendor_id: int):
-    vendor = Vendor.query.get(vendor_id)
-    return VendorSchema(id=vendor.id, name=vendor.name)
+    async with async_session() as session:
+        ven = await session.execute(select(Vendor).where(Vendor.id == vendor_id))
+        vendor = ven.scalar_one_or_none()
+        if vendor is None:
+            raise HTTPException(status_code = 500, detail="Something wrong")
+        return vendor
+
 
 @app.post("/vendors/create")
 async def add_vendor(item: VendorSchema):
-    new_vendor = Vendor(**item)
+    new_vendor = Vendor(**dict(item))
     async with async_session() as session:
         session.add(new_vendor)
         await session.commit()
     return item
+
+class BuyerSchema(BaseModel):
+    first_name: str
+    last_name: str
+    phone: str
+    email: str
+    password: str
+    login: str
+
+@app.get('/buyer/{buyer_id}')
+async def get_buyer(buyer_id: int):
+    async with async_session() as session:
+        buy = await session.execute(select(Buyer).where(Buyer.id == buyer_id))
+        buyer = buy.scalar_one_or_none()
+        if buyer is None:
+            raise HTTPException(status_code = 500, detail="Something wrong")
+        return buyer
+    
+
+@app.post("/buyer/create")
+async def add_buyer(item: BuyerSchema):
+    new_buyer = Buyer(**dict(item))
+    async with async_session() as session:
+        session.add(new_buyer)
+        await session.commit()
+    return item
+
 
