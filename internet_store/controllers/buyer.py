@@ -1,33 +1,29 @@
-from pydantic import BaseModel
-from internet_store.models import Vendor
+from internet_store.models import Buyer
 from sqlalchemy.future import select
 from internet_store.main import *
+from internet_store.database import async_session
 
-class BuyerSchema(BaseModel):
-    first_name: str
-    last_name: str
-    phone: str
-    email: str
-    password: str
-    login: str
-    
-def get_buyer(buyer_id):
-    async def get_buyer(buyer_id: int):
-        async with async_session() as session:
-            buy = await session.execute(select(Buyer).where(Buyer.id == buyer_id))
-            buyer = buy.scalar_one_or_none()
-            return buyer
 
-def get_all_buyers():
-    async def get_buyer():
-        async with async_session() as session:
-            buy = await session.execute(select(Buyer))
-            return buy
+async def get_buyer(buyer_id):
+    async with async_session() as session:
+        buyer = await session.execute(select(Buyer).where(Buyer.id == buyer_id))
+        data = buyer.all() 
+        result = {}
+        result.update(data)
+    return result
 
-def post_buyer():
-    async def add_buyer(item: BuyerSchema):
+
+
+async def post_buyer(item):
         new_buyer = Buyer(**dict(item))
         async with async_session() as session:
             session.add(new_buyer)
             await session.commit()
         return item
+
+
+# def get_all_buyers():
+#     async def get_buyer():
+#         async with async_session() as session:
+#             buy = await session.execute(select(Buyer))
+#             return buy

@@ -8,9 +8,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngin
 from internet_store.routers.vendors import router
 from fastapi import APIRouter
 
-engine: AsyncEngine = create_async_engine(f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
-async_session: AsyncSession = sessionmaker(engine, class_= AsyncSession)
-
 
 app = FastAPI()
 
@@ -37,38 +34,38 @@ app.include_router(router)
 #         await session.commit()
 #     return item
 
-class BuyerSchema(BaseModel):
-    first_name: str
-    last_name: str
-    phone: str
-    email: str
-    password: str
-    login: str
+# class BuyerSchema(BaseModel):
+#     first_name: str
+#     last_name: str
+#     phone: str
+#     email: str
+#     password: str
+#     login: str
 
-@app.get('/buyer/{buyer_id}')
-async def get_buyer(buyer_id: int):
-    async with async_session() as session:
-        buy = await session.execute(select(Buyer).where(Buyer.id == buyer_id))
-        buyer = buy.scalar_one_or_none()
-        return buyer
+# @app.get('/buyer/{buyer_id}')
+# async def get_buyer(buyer_id: int):
+#     async with async_session() as session:
+#         buy = await session.execute(select(Buyer).where(Buyer.id == buyer_id))
+#         buyer = buy.scalar_one_or_none()
+#         return buyer
     
-@app.get('/buyers')
-async def get_buyer():
-    async with async_session() as session:
-        buy = await session.execute(select(Buyer))
-        return buy
+# @app.get('/buyers')
+# async def get_buyer():
+#     async with async_session() as session:
+#         buy = await session.execute(select(Buyer))
+#         return buy
 
-@app.post("/buyer/create")
-async def add_buyer(item: BuyerSchema):
-    new_buyer = Buyer(**dict(item))
-    async with async_session() as session:
-        session.add(new_buyer)
-        await session.commit()
-    return item
+# @app.post("/buyer/create")
+# async def add_buyer(item: BuyerSchema):
+#     new_buyer = Buyer(**dict(item))
+#     async with async_session() as session:
+#         session.add(new_buyer)
+#         await session.commit()
+#     return item
 
-class OrdersSchema(BaseModel):
-    id: int
-    buyer_id: int
+# class OrdersSchema(BaseModel):
+#     id: int
+#     buyer_id: int
 
 # @app.get("/orders/{order_id}")
 # async def get_order():
