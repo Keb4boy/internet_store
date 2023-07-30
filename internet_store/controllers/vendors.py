@@ -19,3 +19,11 @@ async def get_vendor(vendor_id):
         result = {}
         result.update(data)
     return result
+
+async def get_all_vendor():
+    async with engine.connect() as session:
+        vendor = await session.execute(select(Vendor))
+        data = vendor.all() 
+        result = {}
+        result.update(data)
+    return result

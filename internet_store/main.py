@@ -1,71 +1,19 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from sqlalchemy.future import select
-from sqlalchemy.orm import sessionmaker
-from config import DB_PASSWORD, DB_HOST, DB_NAME, DB_PORT, DB_USER
-from internet_store.models import Vendor, Buyer
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
-from internet_store.routers.vendors import router
-from fastapi import APIRouter
+from fastapi import FastAPI
+from internet_store.routers.vendors import router as router_vendor
+from internet_store.routers.buyer import router as router_buyer
+from internet_store.routers.orders import router as router_order
+from internet_store.routers.orders_product import router as router_orders_product
+from internet_store.routers.warehouse import router as router_warehouse
+from internet_store.routers.warehouse_products import router as router_warehouse_products
+from internet_store.routers.products import router as router_products
 
 
 app = FastAPI()
 
-app.include_router(router)
-
-
-# class VendorSchema(BaseModel):
-#     name: str
-
-
-# @app.get("/vendors/{vendor_id}", response_model=VendorSchema)
-# async def get_vendor(vendor_id: int):
-#     async with async_session() as session:
-#         ven = await session.execute(select(Vendor).where(Vendor.id == vendor_id))
-#         vendor = ven.scalar_one_or_none()
-#         return vendor
-
-
-# @app.post("/vendors/create")
-# async def add_vendor(item: VendorSchema):
-#     new_vendor = Vendor(**dict(item))
-#     async with async_session() as session:
-#         session.add(new_vendor)
-#         await session.commit()
-#     return item
-
-# class BuyerSchema(BaseModel):
-#     first_name: str
-#     last_name: str
-#     phone: str
-#     email: str
-#     password: str
-#     login: str
-
-# @app.get('/buyer/{buyer_id}')
-# async def get_buyer(buyer_id: int):
-#     async with async_session() as session:
-#         buy = await session.execute(select(Buyer).where(Buyer.id == buyer_id))
-#         buyer = buy.scalar_one_or_none()
-#         return buyer
-    
-# @app.get('/buyers')
-# async def get_buyer():
-#     async with async_session() as session:
-#         buy = await session.execute(select(Buyer))
-#         return buy
-
-# @app.post("/buyer/create")
-# async def add_buyer(item: BuyerSchema):
-#     new_buyer = Buyer(**dict(item))
-#     async with async_session() as session:
-#         session.add(new_buyer)
-#         await session.commit()
-#     return item
-
-# class OrdersSchema(BaseModel):
-#     id: int
-#     buyer_id: int
-
-# @app.get("/orders/{order_id}")
-# async def get_order():
+app.include_router(router_buyer) 
+app.include_router(router_order) 
+app.include_router(router_orders_product) 
+app.include_router(router_products) 
+app.include_router(router_warehouse) 
+app.include_router(router_vendor) 
+app.include_router(router_warehouse_products) 
