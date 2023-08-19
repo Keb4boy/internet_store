@@ -12,7 +12,14 @@ async def post_vendors(item):
         await session.commit()
     return item
 
-    
+async def get_all_vendor(offset: int, limit: int):
+    async with engine.connect() as session:
+        vendor = await session.execute(select(Vendor).offset(offset).limit(limit))
+        data = vendor.all() 
+        result = []
+        result.extend(data)
+    return result    
+
 async def get_vendor(vendor_id):
     async with engine.connect() as session:
         vendor = await session.execute(select(Vendor).where(Vendor.id == vendor_id))
@@ -21,10 +28,3 @@ async def get_vendor(vendor_id):
         result.update(data)
     return result
 
-async def get_all_vendor(offset: int, limit: int):
-    async with engine.connect() as session:
-        vendor = await session.execute(select(Vendor).offset(offset).limit(limit))
-        data = vendor.all() 
-        result = {}
-        result.update(data)
-    return result
