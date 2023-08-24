@@ -9,7 +9,7 @@ async def get_product(product_id):
         data = product.all()
         result = {}
         result.update(data)
-    return result
+    return result.__dict__
 
 async def post_product(item):
     new_product = Product(**dict(item))
