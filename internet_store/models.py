@@ -42,7 +42,7 @@ class Buyer(BaseModel):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
-    email = Column(EmailType(), nullable=False)
+    email = Column(EmailType(), nullable=False) # to do uniqe
     password = Column(String, nullable=False)
     login = Column(String, nullable=False)
 
